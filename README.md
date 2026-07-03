@@ -1,18 +1,15 @@
-# yeowoobang-follow-list
+# 여우방 팔로우리스트 V8
 
-여우방 팔로우리스트 V7 사용자용 GitHub Pages/PWA 프로젝트입니다.
+GitHub Pages용 사용자 앱입니다.
 
-## 파일
-- `index.html` 메인 화면
-- `style.css` 디자인
-- `script.js` 기능 및 Google Sheet CSV 연동
-- `manifest.json` PWA 설치 설정
-- `sw.js` 오프라인 캐시
-- `icons/` 앱 아이콘
+## 포함 기능
+- Google Sheet CSV 자동 연동
+- 전체 인원/조 수 표시
+- 검색
+- 전체 복사 / 조별 복사 / 개별 복사
+- 인스타 바로가기
+- 공지 표시
+- PWA 설치 지원
 
-## 데이터 수정
-회원 명단은 Google 스프레드시트 `Sheet2`에서 수정합니다.
-열 순서: 번호 / 닉네임 / 아이디
-
-## 중요
-Google Sheet가 웹에 게시되어 있어야 실제 데이터가 표시됩니다.
+## 데이터 시트
+`script.js`의 `SHEET_CSV_URL`을 수정하면 다른 시트로 연결할 수 있습니다.

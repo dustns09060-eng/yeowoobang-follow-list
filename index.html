@@ -1,70 +1,69 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#ff5f8d" />
+  <meta name="theme-color" content="#ff5b93" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="여우방" />
   <title>여우방 팔로우리스트</title>
   <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" href="icons/icon-180.png" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="noticeModal" class="modal" hidden>
-    <div class="modal-card">
-      <div class="modal-title">📢 공지</div>
-      <div id="noticeText" class="modal-text"></div>
-      <div class="modal-actions">
-        <button id="noticeTodayBtn" class="btn ghost">오늘 하루 안보기</button>
-        <button id="noticeCloseBtn" class="btn primary">닫기</button>
+  <div class="app-shell">
+    <header class="hero">
+      <div class="brand-row">
+        <img class="app-icon" src="icon-192.png" alt="여우방" />
+        <div>
+          <p class="eyebrow">FOLLOW LIST</p>
+          <h1 id="appTitle">여우방 팔로우리스트</h1>
+          <p class="desc">시트 수정만 하면 자동으로 반영되는 사용자용 앱</p>
+        </div>
       </div>
-    </div>
+    </header>
+
+    <main>
+      <section id="noticeCard" class="notice-card hidden">
+        <div class="notice-title" id="noticeTitle">📢 공지</div>
+        <div class="notice-content" id="noticeContent"></div>
+        <button class="notice-close" type="button" id="noticeClose">닫기</button>
+      </section>
+
+      <section class="stats-card">
+        <div class="stat-box"><strong id="totalCount">0</strong><span>전체 인원</span></div>
+        <div class="stat-box"><strong id="groupCount">0</strong><span>전체 조</span></div>
+        <div class="stat-box"><strong id="groupSizeText">30</strong><span>조별 인원</span></div>
+      </section>
+
+      <section class="control-card">
+        <label class="search-wrap" for="searchInput">
+          <span>🔍</span>
+          <input id="searchInput" type="search" placeholder="번호 · 닉네임 · 아이디 검색" autocomplete="off" />
+        </label>
+
+        <div class="main-actions">
+          <button class="gradient-btn" id="copyCurrentBtn" type="button">📋 현재 목록 복사</button>
+          <button class="solid-btn" id="refreshBtn" type="button">🔄 새로고침</button>
+        </div>
+
+        <div class="tabs" id="tabs"></div>
+        <p class="result-text" id="resultText">불러오는 중...</p>
+      </section>
+
+      <section id="memberList" class="member-list"></section>
+    </main>
   </div>
 
-  <header class="app-header">
-    <div class="brand">
-      <img src="icons/icon-192.png" alt="여우방" class="logo" />
-      <div>
-        <div class="eyebrow">FOLLOW LIST</div>
-        <h1 id="appTitle">여우방 팔로우리스트</h1>
-      </div>
-    </div>
-    <button id="installBtn" class="install-btn" hidden>앱 설치</button>
-  </header>
-
-  <main class="container">
-    <section class="summary card">
-      <div class="stat"><b id="totalCount">0</b><span>전체 인원</span></div>
-      <div class="stat"><b id="groupCount">0</b><span>전체 조</span></div>
-      <div class="stat"><b id="groupSizeLabel">30</b><span>조별 인원</span></div>
-    </section>
-
-    <section class="card controls">
-      <label class="search-wrap">
-        <span>🔍</span>
-        <input id="searchInput" type="search" placeholder="번호 · 닉네임 · 아이디 검색" autocomplete="off" />
-      </label>
-      <div class="button-grid">
-        <button id="copyAllBtn" class="btn gradient">📋 현재 목록 복사</button>
-        <button id="refreshBtn" class="btn primary">🔄 새로고침</button>
-      </div>
-      <div id="tabs" class="tabs"></div>
-      <div id="resultInfo" class="result-info">불러오는 중...</div>
-    </section>
-
-    <section id="noticeBox" class="notice-box" hidden></section>
-    <section id="list" class="list"></section>
-  </main>
-
   <nav class="bottom-nav">
-    <button id="homeBtn">🏠<span>홈</span></button>
-    <button id="bottomCopyBtn">📋<span>복사</span></button>
-    <button id="bottomRefreshBtn">🔄<span>새로고침</span></button>
+    <button id="homeBtn" type="button">🏠<span>홈</span></button>
+    <button id="copyBottomBtn" type="button">📋<span>복사</span></button>
+    <button id="refreshBottomBtn" type="button">🔄<span>새로고침</span></button>
   </nav>
 
+  <div id="toast" class="toast"></div>
   <script src="script.js"></script>
 </body>
 </html>
