@@ -13,3 +13,8 @@ GitHub Pages용 사용자 앱입니다.
 
 ## 데이터 시트
 `script.js`의 `SHEET_CSV_URL`을 수정하면 다른 시트로 연결할 수 있습니다.
+
+
+## V8 group-copy-only
+- 전체 복사/개별 복사 제거
+- 조별 복사만 유지

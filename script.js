@@ -110,19 +110,16 @@ function renderList(){
     return `<section class="group-section"><div class="group-title">🦊 ${g}조 (${list.length}명)</div><button class="group-copy" data-copy-group="${g}">📋 ${g}조 복사</button><div class="member-grid">${cards}</div></section>`;
   }).join('');
   document.querySelectorAll('[data-copy-group]').forEach(btn=>btn.addEventListener('click',()=>copyGroup(Number(btn.dataset.copyGroup))));
-  document.querySelectorAll('[data-copy-one]').forEach(btn=>btn.addEventListener('click',()=>copyMember(Number(btn.dataset.copyOne))));
 }
 
 function cardHTML(m){
   const id=m.insta.replace('@','');
-  return `<article class="member-card"><div class="member-top"><div><span class="member-no">${m.no}</span><span class="member-name">${escapeHTML(m.nickname)}</span></div></div><div class="member-id">${escapeHTML(m.insta)}</div><a class="insta-link" href="https://instagram.com/${encodeURIComponent(id)}" target="_blank" rel="noopener">📷 인스타 바로가기</a><button class="copy-one" data-copy-one="${m.no}">📋 이 사람 복사</button></article>`;
+  return `<article class="member-card"><div class="member-top"><div><span class="member-no">${m.no}</span><span class="member-name">${escapeHTML(m.nickname)}</span></div></div><div class="member-id">${escapeHTML(m.insta)}</div><a class="insta-link" href="https://instagram.com/${encodeURIComponent(id)}" target="_blank" rel="noopener">📷 인스타 바로가기</a></article>`;
 }
 
 function escapeHTML(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 function line(m){ return `${m.no}. ${m.nickname} ${m.insta}`; }
-function currentText(){ return filtered.map(line).join('\n'); }
 function copyGroup(g){ copyText(members.filter(m=>groupNo(m.no)===g).map(line).join('\n')); }
-function copyMember(no){ const m=members.find(x=>x.no===no); if(m) copyText(line(m)); }
 async function copyText(text){
   if(!text) return showToast('복사할 내용이 없습니다.');
   try{ await navigator.clipboard.writeText(text); showToast('복사되었습니다'); }
@@ -135,8 +132,6 @@ function setLoading(on){ $('resultText').textContent=on?'불러오는 중...':$(
 function init(){
   $('appTitle').textContent=APP_NAME;
   $('searchInput').addEventListener('input', render);
-  $('copyCurrentBtn').addEventListener('click',()=>copyText(currentText()));
-  $('copyBottomBtn').addEventListener('click',()=>copyText(currentText()));
   $('refreshBtn').addEventListener('click',loadMembers);
   $('refreshBottomBtn').addEventListener('click',loadMembers);
   $('homeBtn').addEventListener('click',()=>scrollTo({top:0,behavior:'smooth'}));
