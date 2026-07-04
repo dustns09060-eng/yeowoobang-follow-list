@@ -1,47 +1,58 @@
-// Apps Script 관리자 백엔드 예시
-// 배포: 웹앱 / 액세스: 모든 사용자
+// 여우방 V13 관리자 백엔드
+// Apps Script 새 프로젝트에 붙여넣기 → 배포 > 웹 앱 > 모든 사용자
 const SPREADSHEET_ID = "1_WsSmEpXcckIV9wbQp2K6YZe4jZ2XlX2Vt6lmXmfiHs";
 const SHEET_NAME = "Sheet2";
 const NOTICE_SHEET = "공지";
 const ADMIN_PASSWORD = "0702";
 
-function doPost(e){
-  const data = JSON.parse(e.postData.contents || "{}");
-  if (String(data.password) !== ADMIN_PASSWORD) return ContentService.createTextOutput("비밀번호가 틀렸습니다.");
+function doGet(e){
+  const p = e.parameter || {};
+  const cb = p.callback || "callback";
+  const msg = handleAction(p);
+  return ContentService
+    .createTextOutput(cb + "(" + JSON.stringify(msg) + ")")
+    .setMimeType(ContentService.MimeType.JAVASCRIPT);
+}
+
+function handleAction(data){
+  if (String(data.password) !== ADMIN_PASSWORD) return "비밀번호가 틀렸습니다.";
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   const sheet = ss.getSheetByName(SHEET_NAME);
 
   if (data.action === "add") {
-    const last = sheet.getLastRow();
-    const nextNo = last >= 2 ? Number(sheet.getRange(last,1).getValue()) + 1 : 1;
-    const insta = String(data.insta || "").trim().replace(/^@?/, "@");
+    const rows = sheet.getDataRange().getValues();
+    let maxNo = 0;
+    for (let i=1;i<rows.length;i++) maxNo = Math.max(maxNo, Number(rows[i][0]) || 0);
+    const nextNo = maxNo + 1;
+    const insta = normInsta(data.insta);
+    if (!data.nickname || !insta) return "닉네임과 아이디를 입력해주세요.";
     sheet.appendRow([nextNo, data.nickname, insta]);
-    return out(nextNo + "번 추가 완료");
+    return nextNo + "번 추가 완료";
   }
 
   if (data.action === "edit") {
     const no = Number(data.no);
     const rows = sheet.getDataRange().getValues();
     for (let i=1;i<rows.length;i++){
-      if(Number(rows[i][0])===no){
-        sheet.getRange(i+1,2).setValue(data.nickname);
-        sheet.getRange(i+1,3).setValue(String(data.insta||"").trim().replace(/^@?/, "@"));
-        return out(no + "번 수정 완료");
+      if(Number(rows[i][0]) === no){
+        sheet.getRange(i+1,2).setValue(data.nickname || "");
+        sheet.getRange(i+1,3).setValue(normInsta(data.insta));
+        return no + "번 수정 완료";
       }
     }
-    return out("번호를 찾지 못했습니다.");
+    return "번호를 찾지 못했습니다.";
   }
 
   if (data.action === "delete") {
     const no = Number(data.no);
     const rows = sheet.getDataRange().getValues();
     for (let i=1;i<rows.length;i++){
-      if(Number(rows[i][0])===no){
+      if(Number(rows[i][0]) === no){
         sheet.deleteRow(i+1);
-        return out(no + "번 삭제 완료");
+        return no + "번 삭제 완료";
       }
     }
-    return out("번호를 찾지 못했습니다.");
+    return "번호를 찾지 못했습니다.";
   }
 
   if (data.action === "notice") {
@@ -50,9 +61,9 @@ function doPost(e){
     ns.getRange("B1").setValue("내용");
     ns.getRange("A2").setValue(data.title || "");
     ns.getRange("B2").setValue(data.content || "");
-    return out("공지 저장 완료");
+    return data.title || data.content ? "공지 저장 완료" : "공지 삭제 완료";
   }
 
-  return out("알 수 없는 작업입니다.");
+  return "알 수 없는 작업입니다.";
 }
-function out(msg){ return ContentService.createTextOutput(msg); }
+function normInsta(v){ v=String(v||"").trim(); return v ? (v.startsWith("@") ? v : "@"+v) : ""; }
