@@ -115,6 +115,6 @@ function init(){
   $('refreshBottomBtn').addEventListener('click',loadMembers);
   $('homeBtn').addEventListener('click',()=>scrollTo({top:0,behavior:'smooth'}));
   loadMembers();
-  if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js?v=9').catch(()=>{});
+  if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js?v=10').catch(()=>{});
 }
 document.addEventListener('DOMContentLoaded', init);
