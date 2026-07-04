@@ -1,69 +1,48 @@
-// 여우방 V13 관리자 백엔드
-// Apps Script 새 프로젝트에 붙여넣기 → 배포 > 웹 앱 > 모든 사용자
-const SPREADSHEET_ID = "1_WsSmEpXcckIV9wbQp2K6YZe4jZ2XlX2Vt6lmXmfiHs";
-const SHEET_NAME = "Sheet2";
-const NOTICE_SHEET = "공지";
-const ADMIN_PASSWORD = "0702";
+const SPREADSHEET_ID = '1_WsSmEpXcckIV9wbQp2K6YZe4jZ2XlX2Vt6lmXmfiHs';
+const LIST_SHEET = 'Sheet2';
+const NOTICE_SHEET = '공지';
+const ADMIN_PASSWORD = '0702';
 
-function doGet(e){
-  const p = e.parameter || {};
-  const cb = p.callback || "callback";
-  const msg = handleAction(p);
-  return ContentService
-    .createTextOutput(cb + "(" + JSON.stringify(msg) + ")")
-    .setMimeType(ContentService.MimeType.JAVASCRIPT);
-}
-
-function handleAction(data){
-  if (String(data.password) !== ADMIN_PASSWORD) return "비밀번호가 틀렸습니다.";
+function doPost(e){
+  const body = JSON.parse(e.postData.contents || '{}');
+  if(String(body.password || '') !== ADMIN_PASSWORD) return json({ok:false, message:'비밀번호 오류'});
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const sheet = ss.getSheetByName(SHEET_NAME);
-
-  if (data.action === "add") {
-    const rows = sheet.getDataRange().getValues();
-    let maxNo = 0;
-    for (let i=1;i<rows.length;i++) maxNo = Math.max(maxNo, Number(rows[i][0]) || 0);
-    const nextNo = maxNo + 1;
-    const insta = normInsta(data.insta);
-    if (!data.nickname || !insta) return "닉네임과 아이디를 입력해주세요.";
-    sheet.appendRow([nextNo, data.nickname, insta]);
-    return nextNo + "번 추가 완료";
+  const sheet = ss.getSheetByName(LIST_SHEET);
+  if(body.action === 'add'){
+    const last = sheet.getLastRow();
+    const data = last > 1 ? sheet.getRange(2,1,last-1,1).getValues().flat().map(Number).filter(Boolean) : [];
+    const nextNo = data.length ? Math.max(...data)+1 : 1;
+    sheet.appendRow([nextNo, body.nickname, normalizeInsta_(body.insta)]);
+    return json({ok:true});
   }
-
-  if (data.action === "edit") {
-    const no = Number(data.no);
-    const rows = sheet.getDataRange().getValues();
-    for (let i=1;i<rows.length;i++){
-      if(Number(rows[i][0]) === no){
-        sheet.getRange(i+1,2).setValue(data.nickname || "");
-        sheet.getRange(i+1,3).setValue(normInsta(data.insta));
-        return no + "번 수정 완료";
+  if(body.action === 'update'){
+    const values = sheet.getDataRange().getValues();
+    for(let i=1;i<values.length;i++){
+      if(Number(values[i][0]) === Number(body.no)){
+        sheet.getRange(i+1,2).setValue(body.nickname);
+        sheet.getRange(i+1,3).setValue(normalizeInsta_(body.insta));
+        return json({ok:true});
       }
     }
-    return "번호를 찾지 못했습니다.";
+    return json({ok:false, message:'번호 없음'});
   }
-
-  if (data.action === "delete") {
-    const no = Number(data.no);
-    const rows = sheet.getDataRange().getValues();
-    for (let i=1;i<rows.length;i++){
-      if(Number(rows[i][0]) === no){
+  if(body.action === 'delete'){
+    const values = sheet.getDataRange().getValues();
+    for(let i=1;i<values.length;i++){
+      if(Number(values[i][0]) === Number(body.no)){
         sheet.deleteRow(i+1);
-        return no + "번 삭제 완료";
+        return json({ok:true});
       }
     }
-    return "번호를 찾지 못했습니다.";
+    return json({ok:false, message:'번호 없음'});
   }
-
-  if (data.action === "notice") {
-    let ns = ss.getSheetByName(NOTICE_SHEET) || ss.insertSheet(NOTICE_SHEET);
-    ns.getRange("A1").setValue("제목");
-    ns.getRange("B1").setValue("내용");
-    ns.getRange("A2").setValue(data.title || "");
-    ns.getRange("B2").setValue(data.content || "");
-    return data.title || data.content ? "공지 저장 완료" : "공지 삭제 완료";
+  if(body.action === 'saveNotice'){
+    let notice = ss.getSheetByName(NOTICE_SHEET);
+    if(!notice){ notice = ss.insertSheet(NOTICE_SHEET); notice.appendRow(['공지']); }
+    notice.getRange('A2').setValue(body.notice || '');
+    return json({ok:true});
   }
-
-  return "알 수 없는 작업입니다.";
+  return json({ok:false, message:'알 수 없는 작업'});
 }
-function normInsta(v){ v=String(v||"").trim(); return v ? (v.startsWith("@") ? v : "@"+v) : ""; }
+function normalizeInsta_(v){ v = String(v || '').trim(); return v && !v.startsWith('@') ? '@'+v : v; }
+function json(o){ return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }

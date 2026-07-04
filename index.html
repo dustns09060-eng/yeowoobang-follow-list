@@ -1,98 +1,109 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#ff4f87" />
-  <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ff5a92" />
   <title>여우방 팔로우리스트</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<header class="hero">
-  <img class="logo" src="icon-192.png" alt="여우방">
-  <div>
-    <div class="eyebrow">FOLLOW LIST</div>
-    <h1>여우방 팔로우리스트</h1>
-  </div>
-</header>
+  <div id="toast" class="toast"></div>
 
-<main>
-  <section class="stats">
-    <div><b id="totalCount">0</b><span>전체 인원</span></div>
-    <div><b id="groupCount">0</b><span>전체 조</span></div>
-    <div><b id="groupSizeText">30</b><span>조별 인원</span></div>
-  </section>
-
-  <section class="panel">
-    <input id="searchInput" placeholder="🔍 번호 · 닉네임 · 아이디 검색" />
-    <div class="topBtns">
-      <button id="refreshBtn">🔄 새로고침</button>
-      <button id="adminBtn" class="adminBtn">🔐 관리자모드</button>
-    </div>
-    <div id="tabs" class="tabs"></div>
-    <p id="resultCount" class="resultCount">검색 결과 0명</p>
-  </section>
-
-  <section id="noticeBox" class="notice hidden"></section>
-  <section id="list"></section>
-</main>
-
-<nav class="bottomNav">
-  <button onclick="window.scrollTo({top:0,behavior:'smooth'})">🏠<span>홈</span></button>
-  <button id="bottomRefresh">🔄<span>새로고침</span></button>
-  <button id="bottomAdmin">🔐<span>관리자</span></button>
-</nav>
-
-<div id="adminModal" class="modal hidden">
-  <div class="modalCard">
-    <button class="x" id="closeAdmin">×</button>
-    <h2>🔐 관리자 모드</h2>
-    <input id="adminPw" type="password" inputmode="numeric" placeholder="비밀번호 0702 입력">
-    <button id="loginBtn">로그인</button>
-
-    <div id="adminArea" class="hidden">
-      <div class="adminTabs">
-        <button data-admin-tab="add" class="on">추가</button>
-        <button data-admin-tab="edit">수정</button>
-        <button data-admin-tab="delete">삭제</button>
-        <button data-admin-tab="notice">공지</button>
+  <main id="app" class="app">
+    <header class="hero">
+      <img class="logo" src="icons/icon-192.png" alt="여우방" />
+      <div>
+        <div class="eyebrow">FOLLOW LIST</div>
+        <h1>여우방 팔로우리스트</h1>
       </div>
+    </header>
 
-      <div id="admin-add" class="adminPane">
-        <h3>➕ 인원 추가</h3>
-        <input id="addName" placeholder="닉네임">
-        <input id="addInsta" placeholder="@아이디">
-        <button onclick="adminAdd()">추가하기</button>
+    <section class="stats-card">
+      <div class="stat"><b id="totalCount">0</b><span>전체 인원</span></div>
+      <div class="stat"><b id="groupCount">0</b><span>전체 조</span></div>
+      <div class="stat"><b id="groupSizeText">30</b><span>조별 인원</span></div>
+    </section>
+
+    <section class="control-card">
+      <label class="search-wrap">
+        <span>🔍</span>
+        <input id="searchInput" type="search" placeholder="번호 · 닉네임 · 아이디 검색" autocomplete="off" />
+      </label>
+      <div class="quick-actions">
+        <button class="btn primary" id="refreshBtn">↻ 새로고침</button>
+        <button class="btn dark" id="adminOpenBtn">🔐 관리자모드</button>
       </div>
+      <div id="tabs" class="tabs"></div>
+      <p id="resultText" class="result-text">검색 결과 0명</p>
+    </section>
 
-      <div id="admin-edit" class="adminPane hidden">
-        <h3>✏️ 인원 수정</h3>
-        <input id="editNo" inputmode="numeric" placeholder="수정할 번호">
-        <input id="editName" placeholder="새 닉네임">
-        <input id="editInsta" placeholder="@새 아이디">
-        <button onclick="adminEdit()">수정하기</button>
-      </div>
+    <section id="noticeBox" class="notice-box hidden">
+      <div class="notice-title">📢 공지</div>
+      <div id="noticeContent" class="notice-content"></div>
+    </section>
 
-      <div id="admin-delete" class="adminPane hidden">
-        <h3>🗑 인원 삭제</h3>
-        <input id="deleteNo" inputmode="numeric" placeholder="삭제할 번호">
-        <button class="danger" onclick="adminDelete()">삭제하기</button>
-      </div>
+    <section id="list" class="list"></section>
+  </main>
 
-      <div id="admin-notice" class="adminPane hidden">
-        <h3>📢 공지 작성</h3>
-        <input id="noticeTitle" placeholder="공지 제목">
-        <textarea id="noticeContent" placeholder="공지 내용"></textarea>
-        <button onclick="adminNotice()">공지 저장</button>
-        <button class="light" onclick="adminClearNotice()">공지 삭제</button>
-      </div>
+  <nav class="bottom-nav">
+    <button id="homeBtn">⌂<span>홈</span></button>
+    <button id="bottomRefreshBtn">↻<span>새로고침</span></button>
+    <button id="bottomAdminBtn">🔐<span>관리자</span></button>
+  </nav>
 
-      <p class="hint">비밀번호: 0702<br>실제 수정은 script.js의 BACKEND_URL 연결 후 반영됩니다.</p>
+  <div id="adminModal" class="modal hidden">
+    <div class="modal-panel login-panel">
+      <button class="close" id="adminCloseBtn">×</button>
+      <h2>🔐 관리자 모드</h2>
+      <input id="adminPw" type="password" inputmode="numeric" placeholder="비밀번호 입력" />
+      <button class="btn primary small" id="loginBtn">로그인</button>
     </div>
   </div>
-</div>
 
-<script src="script.js"></script>
+  <section id="adminPage" class="admin-page hidden">
+    <div class="admin-top">
+      <button class="ghost" id="backToUserBtn">‹</button>
+      <h2>관리자 모드</h2>
+      <button class="logout" id="logoutBtn">로그아웃</button>
+    </div>
+
+    <div class="admin-card">
+      <h3>📢 공지 관리</h3>
+      <textarea id="adminNotice" maxlength="200" placeholder="공지 내용을 입력하세요."></textarea>
+      <div class="admin-row">
+        <button class="btn primary" id="saveNoticeBtn">공지 저장</button>
+        <button class="btn outline" id="deleteNoticeBtn">공지 삭제</button>
+      </div>
+    </div>
+
+    <div class="admin-card">
+      <h3>👥 인원 관리</h3>
+      <div class="admin-tabs">
+        <button class="admin-tab active" data-panel="adminListPanel">전체 목록</button>
+        <button class="admin-tab" data-panel="adminAddPanel">추가하기</button>
+      </div>
+
+      <div id="adminListPanel" class="admin-panel">
+        <input id="adminSearch" type="search" placeholder="번호 · 닉네임 · 아이디 검색" />
+        <div id="adminList" class="admin-list"></div>
+      </div>
+
+      <div id="adminAddPanel" class="admin-panel hidden">
+        <input id="addName" placeholder="닉네임" />
+        <input id="addInsta" placeholder="@아이디" />
+        <button class="btn primary" id="addMemberBtn">추가 저장</button>
+      </div>
+    </div>
+
+    <div class="admin-card tip">
+      <b>관리자 안내</b>
+      <p>GitHub Pages 단독으로는 구글시트를 직접 수정할 수 없습니다. ZIP 안의 Apps Script 백엔드를 배포하고 script.js의 BACKEND_URL에 주소를 넣으면 추가/수정/삭제/공지 저장이 실제 반영됩니다.</p>
+    </div>
+  </section>
+
+  <script src="script.js"></script>
 </body>
 </html>
