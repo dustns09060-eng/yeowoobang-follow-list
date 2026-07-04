@@ -1,4 +1,4 @@
-const CACHE_NAME='yeowoobang-v9';
-self.addEventListener('install',event=>{self.skipWaiting();event.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.addAll(['./','./index.html?v=9','./style.css?v=9','./script.js?v=9','./manifest.json?v=9','./icon-192.png?v=9','./icon-512.png?v=9'])))});
-self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE_NAME).map(k=>caches.delete(k)))));self.clients.claim();});
-self.addEventListener('fetch',event=>{if(event.request.url.includes('docs.google.com')) return; event.respondWith(caches.match(event.request).then(cached=>cached||fetch(event.request)));});
+const CACHE='yeowoobang-v11';
+self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./','index.html','style.css','script.js','manifest.json','icon-192.png','icon-512.png'])));self.skipWaiting();});
+self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim();});
+self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)));});

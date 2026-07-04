@@ -1,7 +1,7 @@
 {
   "name": "여우방 팔로우리스트",
   "short_name": "여우방",
-  "start_url": "./index.html?v=9",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#fff1f7",
   "theme_color": "#ff5b93",
