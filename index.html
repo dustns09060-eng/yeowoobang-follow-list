@@ -1,109 +1,236 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#ff5b96" />
+  <meta name="theme-color" content="#ff4f87" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon-192.png" />
   <title>여우방 팔로우리스트</title>
-  <link rel="manifest" href="./manifest.json?v=17" />
-  <link rel="apple-touch-icon" href="./icon-192.png?v=17" />
-  <link rel="icon" href="./icon-192.png?v=17" />
-  <link rel="stylesheet" href="./style.css?v=17" />
+  <style>
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      padding:12px 12px 76px;
+      font-family:Arial,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+      background:linear-gradient(180deg,#ffe8f1,#fff8fb);
+      color:#2a2326;
+    }
+    .top{
+      background:white;
+      border-radius:24px;
+      padding:14px;
+      box-shadow:0 8px 22px rgba(255,79,135,.14);
+      margin-bottom:10px;
+    }
+    .brand{display:flex;align-items:center;gap:10px}
+    .logo{width:48px;height:48px;border-radius:16px;object-fit:cover}
+    h1{font-size:22px;margin:0;color:#ff4f87;line-height:1.1}
+    .sub{font-size:12px;color:#777;margin-top:3px}
+    .stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-top:12px}
+    .stat{border:1px solid #ffd5e3;border-radius:16px;padding:9px 4px;text-align:center;background:#fff}
+    .stat b{display:block;color:#ff4f87;font-size:18px}
+    .stat span{font-size:11px;color:#777}
+    .panel{background:white;border-radius:22px;padding:12px;box-shadow:0 6px 18px rgba(255,79,135,.12);margin-bottom:10px}
+    input{width:100%;padding:12px 13px;border:1px solid #ffd5e3;border-radius:15px;font-size:14px;outline:none}
+    .btnrow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+    button{border:none;border-radius:14px;padding:11px 10px;background:#ff4f87;color:white;font-weight:800;font-size:13px}
+    .soft{background:#fff;color:#ff4f87;border:1px solid #ff4f87}
+    .tabs{display:flex;gap:7px;overflow-x:auto;padding:9px 0 2px}
+    .tab{min-width:52px;background:#fff;color:#ff4f87;border:1px solid #ff4f87;border-radius:999px;padding:9px 10px;white-space:nowrap}
+    .active{background:#ff4f87!important;color:white!important}
+    .count{font-size:12px;color:#777;margin-top:7px}
+    .groupTitle{font-size:18px;font-weight:900;color:#ff4f87;margin:15px 2px 7px}
+    .copyGroup{margin-bottom:7px;background:linear-gradient(90deg,#833ab4,#ff4f87,#fcb045)}
+    .card{
+      display:flex;
+      align-items:center;
+      gap:9px;
+      background:white;
+      border-radius:16px;
+      padding:8px 9px;
+      margin-bottom:6px;
+      box-shadow:0 4px 12px rgba(255,79,135,.11);
+    }
+    .num{
+      width:32px;height:32px;min-width:32px;border-radius:10px;
+      display:flex;align-items:center;justify-content:center;
+      background:#fff1df;color:#ff4f87;font-size:12px;font-weight:900;
+    }
+    .info{flex:1;min-width:0}
+    .name{font-weight:900;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .insta{font-size:11px;color:#777;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+    .ig{text-decoration:none;color:white;background:linear-gradient(90deg,#833ab4,#ff4f87,#fcb045);border-radius:999px;padding:8px 9px;font-size:11px;font-weight:900;white-space:nowrap}
+    .empty{background:white;border-radius:18px;padding:22px;text-align:center;color:#777}
+    .bottom{position:fixed;left:0;right:0;bottom:0;background:#fff;display:flex;box-shadow:0 -4px 14px rgba(0,0,0,.08);padding-bottom:env(safe-area-inset-bottom)}
+    .bottom button{flex:1;background:#fff;color:#ff4f87;border-radius:0;margin:0;padding:8px 4px;font-size:12px}
+    .adminBox{display:none;background:white;border-radius:22px;padding:14px;margin-bottom:10px;box-shadow:0 6px 18px rgba(255,79,135,.12)}
+    .adminBox textarea{width:100%;height:76px;border:1px solid #ffd5e3;border-radius:14px;padding:10px;margin-top:8px}
+    .warn{font-size:12px;color:#777;line-height:1.45;margin-top:8px}
+  </style>
 </head>
 <body>
-  <header class="hero">
-    <img class="app-logo" src="./icon-192.png?v=17" alt="여우방" onerror="this.style.display='none';document.querySelector('.logo-fallback').style.display='grid'">
-    <div class="logo-fallback" aria-hidden="true">🦊</div>
-    <div>
-      <div class="eyebrow">FOLLOW LIST</div>
-      <h1>여우방 팔로우리스트</h1>
+  <div class="top">
+    <div class="brand">
+      <img class="logo" src="icon-192.png" alt="여우방">
+      <div>
+        <h1>여우방 팔로우리스트</h1>
+        <div class="sub">Sheet1 연동 · 조별복사 전용</div>
+      </div>
     </div>
-  </header>
-
-  <main class="wrap">
-    <section class="stats-card">
-      <div><b id="totalCount">0</b><span>전체 인원</span></div>
-      <div><b id="groupCount">0</b><span>전체 조</span></div>
-      <div><b id="groupSizeBox">30</b><span>조별 인원</span></div>
-    </section>
-
-    <section class="control-card">
-      <label class="search-box">
-        <span>🔍</span>
-        <input id="searchInput" type="search" placeholder="번호 · 닉네임 · 아이디 검색" autocomplete="off" />
-      </label>
-      <div class="action-row">
-        <button id="reloadBtn" class="main-btn pink">↻ 새로고침</button>
-        <button id="adminOpenBtn" class="main-btn dark">🔐 관리자모드</button>
-      </div>
-      <div id="tabs" class="tabs"></div>
-      <p id="resultCount" class="muted">검색 결과 0명</p>
-    </section>
-
-    <section id="noticeBox" class="notice-card hidden">
-      <div class="notice-head"><b>📢 공지</b><button id="noticeMoreBtn">닫기</button></div>
-      <p id="noticeText"></p>
-    </section>
-
-    <section id="list" class="list"></section>
-  </main>
-
-  <nav class="bottom-nav">
-    <button id="homeBtn">🏠<span>홈</span></button>
-    <button id="reloadBottomBtn">↻<span>새로고침</span></button>
-    <button id="adminBottomBtn">🔐<span>관리자</span></button>
-  </nav>
-
-  <div id="adminModal" class="modal hidden">
-    <div class="modal-panel">
-      <button class="close" id="adminCloseBtn">×</button>
-      <h2>🔐 관리자 모드</h2>
-      <div id="loginBox" class="login-box">
-        <input id="adminPw" type="password" inputmode="numeric" placeholder="비밀번호 입력" />
-        <button id="loginBtn" class="main-btn pink small">로그인</button>
-      </div>
-
-      <div id="adminPanel" class="hidden admin-panel">
-        <div class="admin-top">
-          <strong>관리자 기능</strong>
-          <button id="logoutBtn" class="mini-btn">로그아웃</button>
-        </div>
-
-        <section class="admin-section">
-          <h3>📢 공지 관리</h3>
-          <textarea id="noticeInput" maxlength="200" placeholder="공지 내용을 입력하세요."></textarea>
-          <div class="admin-actions">
-            <button id="saveNoticeBtn" class="main-btn pink small">공지 저장</button>
-            <button id="deleteNoticeBtn" class="main-btn line small">공지 삭제</button>
-          </div>
-        </section>
-
-        <section class="admin-section">
-          <h3>👥 인원 추가</h3>
-          <input id="addName" placeholder="닉네임" />
-          <input id="addInsta" placeholder="@아이디" />
-          <button id="addBtn" class="main-btn pink small">추가하기</button>
-        </section>
-
-        <section class="admin-section">
-          <h3>✏️ 인원 수정</h3>
-          <input id="editNo" inputmode="numeric" placeholder="수정할 번호" />
-          <input id="editName" placeholder="새 닉네임" />
-          <input id="editInsta" placeholder="@새 아이디" />
-          <button id="editBtn" class="main-btn pink small">수정하기</button>
-        </section>
-
-        <section class="admin-section">
-          <h3>🗑 인원 삭제</h3>
-          <input id="deleteNo" inputmode="numeric" placeholder="삭제할 번호" />
-          <button id="deleteBtn" class="main-btn danger small">삭제하기</button>
-        </section>
-
-        <p class="admin-note">실제 Google 시트 저장은 <b>script.js의 BACKEND_URL</b> 연결 후 작동합니다.</p>
-      </div>
+    <div class="stats">
+      <div class="stat"><b id="total">0</b><span>전체 인원</span></div>
+      <div class="stat"><b id="groups">0</b><span>전체 조</span></div>
+      <div class="stat"><b id="size">30</b><span>조별 인원</span></div>
     </div>
   </div>
 
-  <script src="./script.js?v=17"></script>
+  <div class="panel">
+    <input id="search" placeholder="🔍 번호 · 닉네임 · 아이디 검색" oninput="render()">
+    <div class="btnrow">
+      <button onclick="loadData()">🔄 새로고침</button>
+      <button class="soft" onclick="openAdmin()">🔒 관리자모드</button>
+    </div>
+    <div id="tabs" class="tabs"></div>
+    <div id="count" class="count"></div>
+  </div>
+
+  <div id="adminBox" class="adminBox">
+    <h3 style="margin:0 0 8px;color:#ff4f87;">🔒 관리자 모드</h3>
+    <input id="adminPw" type="password" placeholder="비밀번호 입력">
+    <div class="btnrow">
+      <button onclick="loginAdmin()">로그인</button>
+      <button class="soft" onclick="closeAdmin()">닫기</button>
+    </div>
+    <div id="adminPanel" style="display:none;margin-top:10px;">
+      <input id="adminNo" placeholder="수정/삭제할 번호">
+      <input id="adminName" placeholder="닉네임">
+      <input id="adminInsta" placeholder="@아이디">
+      <div class="btnrow">
+        <button onclick="alert('GitHub Pages에서는 직접 저장이 안 됩니다. 구글시트 앱에서 수정해주세요.')">추가/수정</button>
+        <button class="soft" onclick="alert('GitHub Pages에서는 직접 삭제가 안 됩니다. 구글시트 앱에서 삭제해주세요.')">삭제</button>
+      </div>
+      <textarea id="notice" placeholder="공지 내용"></textarea>
+      <button onclick="alert('공지 저장은 기존 Apps Script 관리자 페이지 또는 구글시트에서 관리해주세요.')">공지 저장</button>
+      <div class="warn">현재 GitHub Pages 버전은 명단 조회 전용입니다. 실제 추가/수정/삭제는 구글시트 앱 또는 기존 Apps Script 관리자 페이지에서 해주세요.</div>
+    </div>
+  </div>
+
+  <div id="list"></div>
+
+  <div class="bottom">
+    <button onclick="window.scrollTo(0,0)">🏠<br>홈</button>
+    <button onclick="loadData()">🔄<br>새로고침</button>
+    <button onclick="openAdmin()">🔒<br>관리자</button>
+  </div>
+
+<script>
+const SHEET_ID = "1m14GywxIymZp6p9izJ6QVWaC8fCnjr5F5OdXCKKUcss";
+const SHEET_NAME = "Sheet1";
+const GROUP_SIZE = 30;
+let allData = [];
+let filtered = [];
+let selected = "전체";
+
+function sheetUrl(){
+  return "https://docs.google.com/spreadsheets/d/" + SHEET_ID +
+    "/gviz/tq?sheet=" + encodeURIComponent(SHEET_NAME) +
+    "&tqx=out:json&cache=" + Date.now();
+}
+
+function parseGviz(text){
+  const json = JSON.parse(text.substring(text.indexOf("(")+1, text.lastIndexOf(")")));
+  const rows = json.table.rows || [];
+  const parsed = rows.map(r => {
+    const c = r.c || [];
+    return [
+      c[0] && c[0].v != null ? c[0].v : "",
+      c[1] && c[1].v != null ? c[1].v : "",
+      c[2] && c[2].v != null ? c[2].v : ""
+    ];
+  });
+  if(parsed.length && String(parsed[0][0]).includes("번호")) parsed.shift();
+  return parsed;
+}
+
+function normalizeInsta(v){
+  v = String(v || "").trim();
+  if(!v) return "";
+  return v.startsWith("@") ? v : "@" + v;
+}
+
+async function loadData(){
+  document.getElementById("count").innerText = "불러오는 중...";
+  try{
+    const res = await fetch(sheetUrl());
+    const text = await res.text();
+    const rows = parseGviz(text);
+    allData = rows.map(r => ({
+      no: Number(String(r[0]).replace(/[^0-9]/g,"")),
+      nickname: String(r[1] || "").trim(),
+      insta: normalizeInsta(r[2])
+    })).filter(x => x.no && x.nickname && x.insta)
+      .sort((a,b) => a.no-b.no);
+    makeTabs();
+    render();
+  }catch(e){
+    document.getElementById("list").innerHTML = '<div class="empty">명단을 불러오지 못했어요.<br>구글시트 공유/게시 설정을 확인해주세요.</div>';
+    document.getElementById("count").innerText = "연동 오류";
+  }
+}
+
+function groupNo(no){ return Math.floor((Number(no)-1)/GROUP_SIZE)+1; }
+
+function makeTabs(){
+  document.getElementById("total").innerText = allData.length.toLocaleString();
+  const max = allData.length ? Math.max(...allData.map(x=>groupNo(x.no))) : 0;
+  document.getElementById("groups").innerText = max.toLocaleString();
+  document.getElementById("size").innerText = GROUP_SIZE;
+  let html = '<button class="tab '+(selected==="전체"?"active":"")+'" onclick="selectTab(\'전체\')">전체</button>';
+  for(let i=1;i<=max;i++) html += '<button class="tab '+(selected===i?"active":"")+'" onclick="selectTab('+i+')">'+i+'조</button>';
+  document.getElementById("tabs").innerHTML = html;
+}
+
+function selectTab(g){ selected = g; makeTabs(); render(); }
+
+function render(){
+  const q = document.getElementById("search").value.toLowerCase().trim();
+  filtered = allData.filter(x => {
+    const text = (x.no+" "+x.nickname+" "+x.insta).toLowerCase();
+    return text.includes(q) && (selected==="전체" || groupNo(x.no)===selected);
+  });
+  document.getElementById("count").innerText = "검색 결과 " + filtered.length.toLocaleString() + "명";
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+  if(!filtered.length){ list.innerHTML = '<div class="empty">표시할 인원이 없습니다.</div>'; return; }
+  const groups = {};
+  filtered.forEach(x => { const g = groupNo(x.no); if(!groups[g]) groups[g]=[]; groups[g].push(x); });
+  Object.keys(groups).map(Number).sort((a,b)=>a-b).forEach(g => {
+    const items = groups[g].sort((a,b)=>a.no-b.no);
+    list.innerHTML += '<div class="groupTitle">🦊 '+g+'조 ('+items.length+'명)</div><button class="copyGroup" onclick="copyGroup('+g+')">📋 '+g+'조 복사</button>';
+    items.forEach(x => {
+      const id = String(x.insta).replace("@","");
+      const div = document.createElement("div");
+      div.className = "card";
+      div.innerHTML = '<div class="num">'+x.no+'</div><div class="info"><div class="name">'+escapeHtml(x.nickname)+'</div><div class="insta">'+escapeHtml(x.insta)+'</div></div><a class="ig" target="_blank" href="https://instagram.com/'+id+'">인스타</a>';
+      list.appendChild(div);
+    });
+  });
+}
+
+function escapeHtml(s){return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
+function line(x){ return x.no + ". " + x.nickname + " " + x.insta; }
+function copyText(t){ navigator.clipboard ? navigator.clipboard.writeText(t).then(()=>alert("복사되었습니다")) : alert(t); }
+function copyGroup(g){ copyText(allData.filter(x=>groupNo(x.no)===g).sort((a,b)=>a.no-b.no).map(line).join(String.fromCharCode(10))); }
+
+function openAdmin(){ document.getElementById("adminBox").style.display="block"; window.scrollTo({top:document.getElementById("adminBox").offsetTop-8, behavior:"smooth"}); }
+function closeAdmin(){ document.getElementById("adminBox").style.display="none"; }
+function loginAdmin(){
+  if(document.getElementById("adminPw").value === "0702") document.getElementById("adminPanel").style.display="block";
+  else alert("비밀번호가 틀렸습니다.");
+}
+
+loadData();
+</script>
 </body>
 </html>
