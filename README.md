@@ -20,3 +20,6 @@
 ## 관리자 실제 저장 연결
 GitHub Pages는 정적 사이트라 직접 Google Sheet를 수정할 수 없습니다.
 `apps-script-admin-backend-Code.gs`를 Apps Script 새 프로젝트에 붙여넣고 웹앱으로 배포한 뒤, 생성된 `/exec` 주소를 `script.js`의 `BACKEND_URL`에 넣으세요.
+
+
+V17: 명단 스프레드시트 ID를 1m14GywxIymZp6p9izJ6QVWaC8fCnjr5F5OdXCKKUcss 로 변경했습니다. Sheet2, 시트1, Sheet1, 기본 첫 시트 순서로 자동 연결을 시도합니다.

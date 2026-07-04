@@ -1,5 +1,5 @@
-const SHEET_ID="1_WsSmEpXcckIV9wbQp2K6YZe4jZ2XlX2Vt6lmXmfiHs";
-const SHEET_NAME="Sheet2";
+const SHEET_ID="1m14GywxIymZp6p9izJ6QVWaC8fCnjr5F5OdXCKKUcss";
+const SHEET_NAMES=["Sheet2","시트1","Sheet1",""];
 const GROUP_SIZE=30;
 const ADMIN_PASSWORD="0702";
 // Apps Script 관리자 백엔드 배포 후 주소를 넣으면 실제 시트 저장이 작동합니다.
@@ -17,10 +17,11 @@ function normInsta(v){
   return v.startsWith("@")?v:"@"+v;
 }
 
-function loadSheetJsonp(){
+function loadSheetJsonp(sheetName){
   return new Promise((resolve,reject)=>{
     const cb="yeowooSheetCallback_"+Date.now()+"_"+Math.floor(Math.random()*10000);
-    const url=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME)}&tqx=responseHandler:${cb};out:json&tq=${encodeURIComponent("select A,B,C")}&_=${Date.now()}`;
+    const sheetPart=sheetName?`sheet=${encodeURIComponent(sheetName)}&`:"";
+    const url=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?${sheetPart}tqx=responseHandler:${cb};out:json&tq=${encodeURIComponent("select A,B,C")}&_=${Date.now()}`;
     const s=document.createElement("script");
     const timer=setTimeout(()=>{cleanup();reject(new Error("timeout"));},12000);
     function cleanup(){clearTimeout(timer);delete window[cb];s.remove();}
@@ -37,6 +38,7 @@ function loadSheetJsonp(){
             insta:normInsta((c[2]&&(c[2].v??c[2].f))||"")
           };
         }).filter(x=>x.no&&x.name&&x.insta).sort((a,b)=>a.no-b.no);
+        if(!data.length) throw new Error("empty sheet");
         resolve(data);
       }catch(e){cleanup();reject(e);}
     };
@@ -45,9 +47,18 @@ function loadSheetJsonp(){
   });
 }
 
+async function loadSheetAuto(){
+  let lastError;
+  for(const name of SHEET_NAMES){
+    try{return await loadSheetJsonp(name);}
+    catch(e){lastError=e;}
+  }
+  throw lastError || new Error("load failed");
+}
+
 async function loadData(){
   try{
-    members=await loadSheetJsonp();
+    members=await loadSheetAuto();
     renderAll();
   }catch(e){
     members=[];
@@ -79,5 +90,5 @@ function addMember(){doAdmin('addMember',{nickname:$('addName').value,insta:$('a
 function editMember(){doAdmin('updateMember',{no:$('editNo').value,nickname:$('editName').value,insta:$('editInsta').value},()=>{})}
 function deleteMember(){if(confirm('정말 삭제할까요?'))doAdmin('deleteMember',{no:$('deleteNo').value},()=>{$('deleteNo').value=''})}
 $('searchInput').addEventListener('input',renderList);$('reloadBtn').onclick=loadData;$('reloadBottomBtn').onclick=loadData;$('homeBtn').onclick=()=>scrollTo({top:0,behavior:'smooth'});$('adminOpenBtn').onclick=openAdmin;$('adminBottomBtn').onclick=openAdmin;$('adminCloseBtn').onclick=closeAdmin;$('loginBtn').onclick=login;$('logoutBtn').onclick=logout;$('saveNoticeBtn').onclick=saveNotice;$('deleteNoticeBtn').onclick=deleteNotice;$('addBtn').onclick=addMember;$('editBtn').onclick=editMember;$('deleteBtn').onclick=deleteMember;$('noticeMoreBtn').onclick=()=>{$('noticeBox').classList.add('hidden')};
-if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js?v=16').catch(()=>{})}
+if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js?v=17').catch(()=>{})}
 loadData();
