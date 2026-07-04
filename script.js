@@ -1,6 +1,5 @@
 const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1_WsSmEpXcckIV9wbQp2K6YZe4jZ2XlX2Vt6lmXmfiHs/gviz/tq?tqx=out:csv&sheet=Sheet2";
 const GROUP_SIZE = 30;
-const APP_NAME = "여우방 팔로우리스트";
 
 let members = [];
 let filtered = [];
@@ -23,19 +22,16 @@ function parseCSV(text){
   if(cur || row.length){ row.push(cur); rows.push(row); }
   return rows.map(r=>r.map(v=>String(v||"").trim())).filter(r=>r.some(Boolean));
 }
-
 function normalizeId(value){
   const raw=String(value||"").trim();
   if(!raw) return "";
   return raw.startsWith("@") ? raw : "@"+raw;
 }
-
 async function fetchCSV(url){
   const res=await fetch(url + (url.includes('?')?'&':'?') + 'cache=' + Date.now(), {cache:'no-store'});
   if(!res.ok) throw new Error('구글시트 데이터를 불러오지 못했습니다.');
   return res.text();
 }
-
 async function loadMembers(){
   setLoading(true);
   try{
@@ -54,9 +50,7 @@ async function loadMembers(){
     showToast(err.message || '오류가 발생했습니다.');
   }finally{ setLoading(false); }
 }
-
 function groupNo(no){ return Math.floor((Number(no)-1)/GROUP_SIZE)+1; }
-
 function buildTabs(){
   const max=members.length ? Math.max(...members.map(m=>groupNo(m.no))) : 0;
   $('totalCount').textContent=members.length.toLocaleString('ko-KR');
@@ -70,7 +64,6 @@ function buildTabs(){
     buildTabs(); render();
   }));
 }
-
 function render(){
   const q=$('searchInput').value.trim().toLowerCase();
   filtered=members.filter(m=>{
@@ -81,7 +74,6 @@ function render(){
   $('resultText').textContent=`검색 결과 ${filtered.length.toLocaleString('ko-KR')}명`;
   renderList();
 }
-
 function renderList(){
   if(!filtered.length){
     $('memberList').innerHTML='<div class="empty-card">표시할 인원이 없습니다.</div>';
@@ -99,35 +91,30 @@ function renderList(){
   }).join('');
   document.querySelectorAll('[data-copy-group]').forEach(btn=>btn.addEventListener('click',()=>copyGroup(Number(btn.dataset.copyGroup))));
 }
-
 function cardHTML(m){
   const id=m.insta.replace('@','');
   return `<article class="member-card">
-    <div class="member-top"><div><span class="member-no">${m.no}</span><span class="member-name">${escapeHTML(m.nickname)}</span></div></div>
+    <div class="member-head"><span class="member-no">${m.no}</span><span class="member-name">${escapeHTML(m.nickname)}</span></div>
     <div class="member-id">${escapeHTML(m.insta)}</div>
     <a class="insta-link" href="https://instagram.com/${encodeURIComponent(id)}" target="_blank" rel="noopener">📷 인스타 바로가기</a>
   </article>`;
 }
-
 function escapeHTML(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 function line(m){ return `${m.no}. ${m.nickname} ${m.insta}`; }
 function copyGroup(g){ copyText(members.filter(m=>groupNo(m.no)===g).map(line).join('\n')); }
 async function copyText(text){
   if(!text) return showToast('복사할 내용이 없습니다.');
   try{ await navigator.clipboard.writeText(text); showToast('복사되었습니다'); }
-  catch(e){
-    const t=document.createElement('textarea'); t.value=text; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); showToast('복사되었습니다');
-  }
+  catch(e){ const t=document.createElement('textarea'); t.value=text; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); showToast('복사되었습니다'); }
 }
 function showToast(msg){ const el=$('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(window.__toast); window.__toast=setTimeout(()=>el.classList.remove('show'),1600); }
 function setLoading(on){ if(on) $('resultText').textContent='불러오는 중...'; }
 function init(){
-  $('appTitle').textContent=APP_NAME;
   $('searchInput').addEventListener('input', render);
   $('refreshBtn').addEventListener('click',loadMembers);
   $('refreshBottomBtn').addEventListener('click',loadMembers);
   $('homeBtn').addEventListener('click',()=>scrollTo({top:0,behavior:'smooth'}));
   loadMembers();
-  if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+  if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js?v=9').catch(()=>{});
 }
 document.addEventListener('DOMContentLoaded', init);
